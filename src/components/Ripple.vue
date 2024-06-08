@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
+// 波紋の広がり速度
+const DURATION_MS = 300
+
 const ripple = ref()
-const duration = 500
 const radius = ref(0)
 
 const sleep = (ms: number): Promise<void> => {
@@ -16,11 +18,11 @@ const rippleAnimation = async (event: MouseEvent) => {
   const animation = document.createElement('span')
   ripple.value.appendChild(animation)
 
-  // 円の半径（親要素と同じサイズの円を作る場合）
-  radius.value = ripple.value.clientWidth / 2
+  // 円の半径（下記なら親要素より2倍幅の円になる）
+  radius.value = ripple.value.clientWidth
 
   // NOTE: 'pointer-events-none'を付与しないと波紋要素のeventを拾ってしまう
-  animation.classList.add('absolute', 'rounded-full', 'scale-0', 'bg-black', 'opacity-30', 'pointer-events-none')
+  animation.classList.add('absolute', 'rounded-full', 'scale-0', 'bg-black', 'opacity-20', 'pointer-events-none')
   animation.style.width = `${radius.value * 2}px`
   animation.style.height = `${radius.value * 2}px`
 
@@ -30,9 +32,10 @@ const rippleAnimation = async (event: MouseEvent) => {
   animation.style.left = `${event.offsetX - radius.value}px`
 
   await sleep(1)
-  animation.classList.add('scale-150', `duration-${duration}`)
+  animation.style.transitionDuration = `${DURATION_MS}ms`
+  animation.classList.add('scale-100')
 
-  await sleep(duration)
+  await sleep(DURATION_MS)
   ripple.value.removeChild(animation)
 }
 </script>
